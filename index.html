@@ -2,41 +2,55 @@
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <title>Per a tu 💛</title>
+  <title>Per a tu ✨</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<!-- HERO -->
 <section class="hero">
-  <h1>Benvinguda al teu lloc secret ✨</h1>
-  <p>Si estàs aquí, és perquè tens la clau correcta.</p>
-  <button onclick="enterSite()">Entrar</button>
+  <div class="hero-card">
+    <h1>Hola, amor 💛</h1>
+    <p>Aquest lloc només existeix perquè tu existeixes.</p>
+    <button onclick="enter()">Entrar</button>
+  </div>
 </section>
 
-<section class="hidden" id="content">
+<!-- CONTENT -->
+<main id="content">
+
+  <section class="message">
+    <h2>Un missatge per a tu</h2>
+    <p>
+      No és una web qualsevol.  
+      És una manera de dir-te que penso en tu,  
+      fins i tot quan no estem junts.
+    </p>
+  </section>
 
   <section class="timeline">
     <h2>La nostra història</h2>
-    <ul>
-      <li>💫 El dia que ens vam conèixer</li>
-      <li>💬 La primera conversa que no volia acabar</li>
-      <li>❤️ Quan vaig saber que eres tu</li>
-    </ul>
+    <div class="event">💫 El dia que ens vam conèixer</div>
+    <div class="event">💬 La conversa que no volia acabar</div>
+    <div class="event">❤️ Quan vaig saber que eres tu</div>
   </section>
 
   <section class="letters">
-    <h2>Cartes per a tu 💌</h2>
-    <div class="card" onclick="openLetter('letter1')">Quan estiguis trista</div>
-    <div class="card" onclick="openLetter('letter2')">Quan em trobis a faltar</div>
+    <h2>Cartes secretes 💌</h2>
+    <div class="letter" onclick="openLetter(1)">Quan estiguis trista</div>
+    <div class="letter" onclick="openLetter(2)">Quan em trobis a faltar</div>
+    <div class="letter" onclick="openLetter(3)">Per qualsevol dia</div>
   </section>
 
   <section class="final">
     <h2>Una última cosa…</h2>
-    <p>Ets el millor que m’ha passat.</p>
-    <button>❤️ T’estimo ❤️</button>
+    <p>Ets casa meva.</p>
+    <span>❤️</span>
   </section>
 
-</section>
+</main>
 
 <script src="script.js"></script>
 </body>
