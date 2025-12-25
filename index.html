@@ -1,57 +1,103 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8">
-  <title>Per a tu ✨</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Nostre Diari de Moments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 350px; border-radius: 1rem; z-index: 1; }
+        .heart-bg { background-color: #fff5f5; }
+    </style>
 </head>
-<body>
+<body class="heart-bg font-sans">
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-card">
-    <h1>Hola, amor 💛</h1>
-    <p>Aquest lloc només existeix perquè tu existeixes.</p>
-    <button onclick="enter()">Entrar</button>
-  </div>
-</section>
+    <header class="p-6 text-center">
+        <h1 class="text-3xl font-bold text-red-500">❤️ Els Nostres Moments</h1>
+        <p class="text-gray-600 text-sm">Escaneja, captura i recorda per sempre</p>
+    </header>
 
-<!-- CONTENT -->
-<main id="content">
+    <main class="max-w-md mx-auto p-4 space-y-6">
 
-  <section class="message">
-    <h2>Un missatge per a tu</h2>
-    <p>
-      No és una web qualsevol.  
-      És una manera de dir-te que penso en tu,  
-      fins i tot quan no estem junts.
-    </p>
-  </section>
+        <section class="bg-white p-6 rounded-3xl shadow-lg border border-red-100">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Nou Record</h2>
+            
+            <div class="space-y-4">
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-red-200 rounded-2xl p-4 hover:bg-red-50 transition-colors cursor-pointer" onclick="document.getElementById('photo-input').click()">
+                    <span class="text-4xl mb-2">📸</span>
+                    <span class="text-sm text-gray-500" id="photo-status">Fes una foto ara mateix</span>
+                    <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+                </div>
 
-  <section class="timeline">
-    <h2>La nostra història</h2>
-    <div class="event">💫 El dia que ens vam conèixer</div>
-    <div class="event">💬 La conversa que no volia acabar</div>
-    <div class="event">❤️ Quan vaig saber que eres tu</div>
-  </section>
+                <input type="text" id="moment-title" placeholder="On som o què fem?" 
+                    class="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-400">
 
-  <section class="letters">
-    <h2>Cartes secretes 💌</h2>
-    <div class="letter" onclick="openLetter(1)">Quan estiguis trista</div>
-    <div class="letter" onclick="openLetter(2)">Quan em trobis a faltar</div>
-    <div class="letter" onclick="openLetter(3)">Per qualsevol dia</div>
-  </section>
+                <button onclick="saveMoment()" id="save-btn"
+                    class="w-full bg-red-500 text-white font-bold py-3 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95">
+                    Guardar Moment ✨
+                </button>
+            </div>
+        </section>
 
-  <section class="final">
-    <h2>Una última cosa…</h2>
-    <p>Ets casa meva.</p>
-    <span>❤️</span>
-  </section>
+        <section class="bg-white p-2 rounded-3xl shadow-lg border border-red-100">
+            <div id="map"></div>
+        </section>
 
-</main>
+    </main>
 
-<script src="script.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicialitzar el mapa
+        const map = L.map('map').setView([41.3851, 2.1734], 13); // Barcelona per defecte
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Lògica de la càmera (previsualització)
+        const photoInput = document.getElementById('photo-input');
+        photoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                document.getElementById('photo-status').innerText = "Foto llesta! ✅";
+            }
+        });
+
+        function saveMoment() {
+            const title = document.getElementById('moment-title').value;
+            const btn = document.getElementById('save-btn');
+            
+            if (!title) {
+                alert("Posa-li un nom al moment!");
+                return;
+            }
+
+            btn.innerText = "Guardant...";
+            btn.disabled = true;
+
+            // Obtenir Ubicació
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    
+                    // Aquí és on connectarem amb Firebase a la Fase 2
+                    console.log("Dades a guardar:", { title, latitude, longitude });
+                    
+                    // Simulació de guardat
+                    setTimeout(() => {
+                        alert("Moment guardat (simulació)!");
+                        btn.innerText = "Guardar Moment ✨";
+                        btn.disabled = false;
+                        
+                        // Afegir marcador al mapa
+                        L.marker([latitude, longitude]).addTo(map)
+                            .bindPopup(`<b>${title}</b><br>Acabes d'estar aquí!`).openPopup();
+                        map.setView([latitude, longitude], 15);
+                    }, 1000);
+
+                }, () => {
+                    alert("Heu d'acceptar els permisos d'ubicació!");
+                    btn.disabled = false;
+                });
+            }
+        }
+    </script>
 </body>
 </html>
