@@ -7,54 +7,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        #map { height: 350px; border-radius: 1.5rem; z-index: 1; }
+        #map { height: 350px; width: 100%; border-radius: 1.5rem; z-index: 1; border: 2px solid #fee2e2; }
         .heart-bg { background-color: #fff5f5; }
-        .custom-popup .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 5px; }
     </style>
 </head>
 <body class="heart-bg font-sans mb-10">
 
     <header class="p-8 text-center">
-        <h1 class="text-4xl font-bold text-red-500 drop-shadow-sm">❤️ Els Nostres Moments</h1>
-        <p class="text-gray-500 mt-2 italic">Apropa la targeta i guarda un record per sempre</p>
+        <h1 class="text-4xl font-bold text-red-500">❤️ Els Nostres Moments</h1>
+        <p class="text-gray-500 mt-2 italic">Captura la màgia de la nostra història</p>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6">
 
         <section class="bg-white p-6 rounded-3xl shadow-xl border border-red-50">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-                <span>📸</span> Nou Moment Especial
-            </h2>
-            
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">📸 Nou Record</h2>
             <div class="space-y-4">
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-red-200 rounded-2xl p-6 hover:bg-red-50 transition-all cursor-pointer group" onclick="document.getElementById('photo-input').click()">
-                    <div class="text-4xl group-hover:scale-110 transition-transform">📷</div>
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-red-200 rounded-2xl p-6 hover:bg-red-50 cursor-pointer" onclick="document.getElementById('photo-input').click()">
+                    <div class="text-4xl" id="camera-icon">📷</div>
                     <span class="text-sm text-gray-400 mt-2" id="photo-status">Prem per fer la foto</span>
                     <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
                 </div>
 
                 <input type="text" id="moment-title" placeholder="Quin moment estem vivint?" 
-                    class="w-full p-4 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-red-400 text-gray-700 shadow-inner">
+                    class="w-full p-4 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-red-400 shadow-inner">
 
                 <button onclick="saveMoment()" id="save-btn"
-                    class="w-full bg-gradient-to-r from-red-400 to-red-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:from-red-500 hover:to-red-600 transition-all active:scale-95 flex justify-center items-center gap-2">
-                    <span>✨</span> Guardar al Mapa
+                    class="w-full bg-red-500 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+                    Guardar Moment ✨
                 </button>
             </div>
         </section>
 
-        <section class="bg-white p-2 rounded-[2rem] shadow-xl border border-red-50 overflow-hidden">
+        <section class="bg-white p-2 rounded-[2rem] shadow-xl overflow-hidden">
             <div id="map"></div>
         </section>
 
     </main>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        // La teva configuració de Firebase
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyDWxiQ90XKEfhW9vMuEDBTuDWeiIKp_9Ys",
             authDomain: "irene-99a19.firebaseapp.com",
@@ -64,94 +61,76 @@
             appId: "1:175449192892:web:515710aa338243623513b9"
         };
 
-        // Inicialitzar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // --- LÒGICA DEL MAPA (Leaflet) ---
-        const map = L.map('map').setView([41.3851, 2.1734], 13); // Barcelona per defecte
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        // Inicialització segura del Mapa
+        const map = L.map('map').setView([41.3851, 2.1734], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Carregar moments de la base de dades i posar-los al mapa
+        // Carregar moments
         async function loadMoments() {
-            const q = query(collection(db, "moments"), orderBy("date", "desc"));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const dateStr = new Date(data.date).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' });
-                
-                L.marker([data.lat, data.lon]).addTo(map)
-                    .bindPopup(`
-                        <div class="text-center">
-                            <img src="${data.imageUrl}" class="rounded-lg mb-2 w-full object-cover h-24">
-                            <b class="text-red-500">${data.title}</b><br>
-                            <small class="text-gray-400">${dateStr}</small>
-                        </div>
-                    `, { className: 'custom-popup' });
-            });
+            try {
+                const q = query(collection(db, "moments"), orderBy("date", "desc"));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    L.marker([data.lat, data.lon]).addTo(map)
+                        .bindPopup(`<img src="${data.imageUrl}" width="100"><br><b>${data.title}</b>`);
+                });
+            } catch (e) { console.error("Error carregant:", e); }
         }
         loadMoments();
 
-        // Actualitzar text quan es selecciona una foto
-        document.getElementById('photo-input').addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                document.getElementById('photo-status').innerText = "📸 Foto seleccionada!";
-                document.getElementById('photo-status').classList.add('text-green-500');
-            }
-        });
-
-        // --- LÒGICA PER GUARDAR ---
+        // Funció Guardar
         window.saveMoment = async function() {
-            const titleInput = document.getElementById('moment-title');
-            const fileInput = document.getElementById('photo-input');
+            const title = document.getElementById('moment-title').value;
+            const file = document.getElementById('photo-input').files[0];
             const btn = document.getElementById('save-btn');
 
-            if (!titleInput.value || !fileInput.files[0]) {
-                alert("Si us plau, posa un títol i fes una foto!");
+            if (!title || !file) {
+                alert("Fes la foto i posa un títol!");
                 return;
             }
 
-            btn.innerText = "🚀 Guardant màgia...";
             btn.disabled = true;
+            btn.innerText = "Guardant...";
 
-            // 1. Obtenir GPS
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { latitude, longitude } = position.coords;
-
+            navigator.geolocation.getCurrentPosition(async (pos) => {
                 try {
-                    // 2. Pujar Foto a Storage
-                    const file = fileInput.files[0];
+                    // 1. Pujar foto
                     const storageRef = ref(storage, `moments/${Date.now()}_${file.name}`);
                     const snapshot = await uploadBytes(storageRef, file);
-                    const downloadURL = await getDownloadURL(snapshot.ref);
+                    const url = await getDownloadURL(snapshot.ref);
 
-                    // 3. Guardar dades a Firestore
+                    // 2. Guardar a la base de dades
                     await addDoc(collection(db, "moments"), {
-                        title: titleInput.value,
-                        imageUrl: downloadURL,
-                        lat: latitude,
-                        lon: longitude,
+                        title: title,
+                        imageUrl: url,
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude,
                         date: new Date().toISOString()
                     });
 
-                    // Èxit
-                    alert("Moment guardat per sempre! ❤️");
-                    location.reload(); 
-
-                } catch (error) {
-                    console.error(error);
-                    alert("Error guardant el moment. Revisa els permisos.");
+                    alert("Fet! ❤️");
+                    location.reload();
+                } catch (e) {
+                    alert("Error! Revisa les 'Rules' de Firebase.");
+                    console.error(e);
                     btn.disabled = false;
-                    btn.innerText = "Guardar Moment ✨";
                 }
-            }, () => {
-                alert("Heu d'activar el GPS per guardar el moment!");
+            }, (err) => {
+                alert("Activa el GPS!");
                 btn.disabled = false;
-                btn.innerText = "Guardar Moment ✨";
             }, { enableHighAccuracy: true });
+        };
+
+        document.getElementById('photo-input').onchange = (e) => {
+            if(e.target.files[0]) {
+                document.getElementById('photo-status').innerText = "✅ Foto llesta!";
+                document.getElementById('camera-icon').innerText = "📸";
+            }
         };
     </script>
 </body>
