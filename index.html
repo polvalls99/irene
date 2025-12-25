@@ -3,101 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Nostre Diari de Moments</title>
+    <title>El Nostre Diari - Supabase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        #map { height: 350px; border-radius: 1rem; z-index: 1; }
+        #map { height: 350px; width: 100%; border-radius: 1.5rem; border: 2px solid #fee2e2; }
         .heart-bg { background-color: #fff5f5; }
     </style>
 </head>
-<body class="heart-bg font-sans">
+<body class="heart-bg font-sans mb-10">
 
-    <header class="p-6 text-center">
-        <h1 class="text-3xl font-bold text-red-500">❤️ Els Nostres Moments</h1>
-        <p class="text-gray-600 text-sm">Escaneja, captura i recorda per sempre</p>
+    <header class="p-8 text-center">
+        <h1 class="text-4xl font-bold text-red-500">❤️ El Nostre Diari</h1>
+        <p class="text-gray-500 mt-2 italic">Guardant moments amb Supabase</p>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6">
-
-        <section class="bg-white p-6 rounded-3xl shadow-lg border border-red-100">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Nou Record</h2>
-            
+        <section class="bg-white p-6 rounded-3xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">📸 Nou Record</h2>
             <div class="space-y-4">
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-red-200 rounded-2xl p-4 hover:bg-red-50 transition-colors cursor-pointer" onclick="document.getElementById('photo-input').click()">
-                    <span class="text-4xl mb-2">📸</span>
-                    <span class="text-sm text-gray-500" id="photo-status">Fes una foto ara mateix</span>
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-red-200 rounded-2xl p-6 cursor-pointer" onclick="document.getElementById('photo-input').click()">
+                    <div class="text-4xl">📷</div>
+                    <span class="text-sm text-gray-400 mt-2" id="photo-status">Prem per fer la foto</span>
                     <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
                 </div>
-
-                <input type="text" id="moment-title" placeholder="On som o què fem?" 
-                    class="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-400">
-
-                <button onclick="saveMoment()" id="save-btn"
-                    class="w-full bg-red-500 text-white font-bold py-3 rounded-xl shadow-md hover:bg-red-600 transition-transform active:scale-95">
-                    Guardar Moment ✨
-                </button>
+                <input type="text" id="moment-title" placeholder="Quin moment és?" class="w-full p-4 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-red-400">
+                <button onclick="saveMoment()" id="save-btn" class="w-full bg-red-500 text-white font-bold py-4 rounded-2xl shadow-lg">Guardar ✨</button>
             </div>
         </section>
 
-        <section class="bg-white p-2 rounded-3xl shadow-lg border border-red-100">
+        <section class="bg-white p-2 rounded-[2rem] shadow-xl overflow-hidden">
             <div id="map"></div>
         </section>
-
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-        // Inicialitzar el mapa
-        const map = L.map('map').setView([41.3851, 2.1734], 13); // Barcelona per defecte
+        // 1. CONFIGURACIÓ SUPABASE (Posa les teves dades aquí)
+        const SUPABASE_URL = 'https://ufczwwhiwnlyndkphemp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_vGtcDYodfd7qxYDd8lMa_A_iLKyhA8H';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Inicialitzar Mapa
+        const map = L.map('map').setView([41.3851, 2.1734], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Lògica de la càmera (previsualització)
-        const photoInput = document.getElementById('photo-input');
-        photoInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                document.getElementById('photo-status').innerText = "Foto llesta! ✅";
-            }
-        });
-
-        function saveMoment() {
-            const title = document.getElementById('moment-title').value;
-            const btn = document.getElementById('save-btn');
-            
-            if (!title) {
-                alert("Posa-li un nom al moment!");
-                return;
-            }
-
-            btn.innerText = "Guardant...";
-            btn.disabled = true;
-
-            // Obtenir Ubicació
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    const { latitude, longitude } = position.coords;
-                    
-                    // Aquí és on connectarem amb Firebase a la Fase 2
-                    console.log("Dades a guardar:", { title, latitude, longitude });
-                    
-                    // Simulació de guardat
-                    setTimeout(() => {
-                        alert("Moment guardat (simulació)!");
-                        btn.innerText = "Guardar Moment ✨";
-                        btn.disabled = false;
-                        
-                        // Afegir marcador al mapa
-                        L.marker([latitude, longitude]).addTo(map)
-                            .bindPopup(`<b>${title}</b><br>Acabes d'estar aquí!`).openPopup();
-                        map.setView([latitude, longitude], 15);
-                    }, 1000);
-
-                }, () => {
-                    alert("Heu d'acceptar els permisos d'ubicació!");
-                    btn.disabled = false;
+        // Carregar moments existents
+        async function loadMoments() {
+            const { data, error } = await supabase.from('moments').select('*');
+            if (data) {
+                data.forEach(m => {
+                    L.marker([m.lat, m.lon]).addTo(map)
+                        .bindPopup(`<img src="${m.image_url}" width="100"><br><b>${m.title}</b>`);
                 });
             }
         }
+        loadMoments();
+
+        // Funció per guardar
+        window.saveMoment = async function() {
+            const title = document.getElementById('moment-title').value;
+            const file = document.getElementById('photo-input').files[0];
+            const btn = document.getElementById('save-btn');
+
+            if (!title || !file) return alert("Falta títol o foto!");
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Guardant...";
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                try {
+                    // A. Pujar Foto
+                    const fileName = `${Date.now()}_${file.name}`;
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('fotos')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    // Obtenir URL pública
+                    const { data: urlData } = supabase.storage.from('fotos').getPublicUrl(fileName);
+                    const publicUrl = urlData.publicUrl;
+
+                    // B. Guardar dades a la taula
+                    const { error: insertError } = await supabase.from('moments').insert([{
+                        title: title,
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude,
+                        image_url: publicUrl
+                    }]);
+
+                    if (insertError) throw insertError;
+
+                    alert("Moment guardat! ❤️");
+                    location.reload();
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Error: " + e.message);
+                    btn.disabled = false;
+                }
+            }, () => alert("Activa el GPS!"));
+        };
+
+        document.getElementById('photo-input').onchange = (e) => {
+            if(e.target.files[0]) document.getElementById('photo-status').innerText = "✅ Foto llesta!";
+        };
     </script>
 </body>
 </html>
