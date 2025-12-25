@@ -1,50 +1,106 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: 'Arial', sans-serif;
   margin: 0;
-  background: #fff5f8;
-  color: #333;
-  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(120deg, #fdf0f3, #fce7ec);
+  color: #2d2d2d;
 }
 
-section {
-  padding: 60px 20px;
-}
-
+/* HERO */
 .hero {
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-button {
-  padding: 12px 24px;
+.hero-card {
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2em;
+}
+
+.hero button {
+  margin-top: 20px;
+  padding: 12px 30px;
   border: none;
+  border-radius: 25px;
   background: #ff6b81;
   color: white;
   font-size: 16px;
-  border-radius: 20px;
   cursor: pointer;
 }
 
-.hidden {
+/* MAIN CONTENT */
+main {
   display: none;
 }
 
-.timeline ul {
-  list-style: none;
-  padding: 0;
+section {
+  padding: 80px 20px;
+  text-align: center;
 }
 
-.timeline li {
-  margin: 15px 0;
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8em;
+  margin-bottom: 20px;
 }
 
-.card {
+/* MESSAGE */
+.message p {
+  max-width: 500px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+/* TIMELINE */
+.timeline .event {
   background: white;
-  margin: 10px auto;
+  margin: 15px auto;
+  padding: 15px;
+  max-width: 400px;
+  border-radius: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+/* LETTERS */
+.letters {
+  background: #fff5f8;
+}
+
+.letter {
+  background: white;
+  margin: 15px auto;
   padding: 20px;
-  width: 250px;
-  border-radius: 15px;
+  max-width: 280px;
+  border-radius: 20px;
   cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.letter:hover {
+  transform: scale(1.05);
+}
+
+/* FINAL */
+.final {
+  font-size: 1.4em;
+}
+
+.final span {
+  font-size: 2em;
 }
