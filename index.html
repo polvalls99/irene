@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>Per a tu 💛</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="hero">
+  <h1>Benvinguda al teu lloc secret ✨</h1>
+  <p>Si estàs aquí, és perquè tens la clau correcta.</p>
+  <button onclick="enterSite()">Entrar</button>
+</section>
+
+<section class="hidden" id="content">
+
+  <section class="timeline">
+    <h2>La nostra història</h2>
+    <ul>
+      <li>💫 El dia que ens vam conèixer</li>
+      <li>💬 La primera conversa que no volia acabar</li>
+      <li>❤️ Quan vaig saber que eres tu</li>
+    </ul>
+  </section>
+
+  <section class="letters">
+    <h2>Cartes per a tu 💌</h2>
+    <div class="card" onclick="openLetter('letter1')">Quan estiguis trista</div>
+    <div class="card" onclick="openLetter('letter2')">Quan em trobis a faltar</div>
+  </section>
+
+  <section class="final">
+    <h2>Una última cosa…</h2>
+    <p>Ets el millor que m’ha passat.</p>
+    <button>❤️ T’estimo ❤️</button>
+  </section>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>

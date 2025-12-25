@@ -1,0 +1,50 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  background: #fff5f8;
+  color: #333;
+  text-align: center;
+}
+
+section {
+  padding: 60px 20px;
+}
+
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+button {
+  padding: 12px 24px;
+  border: none;
+  background: #ff6b81;
+  color: white;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.timeline ul {
+  list-style: none;
+  padding: 0;
+}
+
+.timeline li {
+  margin: 15px 0;
+}
+
+.card {
+  background: white;
+  margin: 10px auto;
+  padding: 20px;
+  width: 250px;
+  border-radius: 15px;
+  cursor: pointer;
+}
